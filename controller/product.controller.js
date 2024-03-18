@@ -20,17 +20,52 @@ exports.addingProduct = async(req, res, next)=>{
 exports.sendingAllvariety = async(req, res, next)=>{
     const items = await Product.find()
     const token =localStorage.getItem('b2cToken')
+    const itemsSendableArray = []
+    items.forEach(el=>{
+        const obj = {
+            name : el.name,
+            price : el.price,
+            quantity : 0,
+            variety : el.variety
+        }
+        itemsSendableArray.push(obj)
+    })
+    if(!token){
+        res.status(200).json({
+            status : 'success',
+            data : {
+                nameArr: [],
+                items : items
+            }
+        })  
+        return
+    }
     const decode = await promisify(jwt.verify)(token, process.env.STRING)
     const findingUser = await SignUp.findById(decode.id)
+    const cart = findingUser.cart
+    let price = 0;
+    cart.forEach(el=>{
+        itemsSendableArray.forEach(item=>{
+            if(item.name===el.itemName){
+                item.quantity = el.units
+            }
+        })
+        price = Number(el.price.split('/-')[0]*el.units) + price
+    })
+
     const nameArr = []
+    const nameAndQuantityArr = []
     findingUser.cart.forEach(el=>{
         nameArr.push(el.itemName)
+        nameAndQuantityArr.push([el.itemName, el.units])
     })
     res.status(200).json({
         status : 'success',
         data : {
             nameArr,
-            items
+            price,
+            nameAndQuantityArr,
+            items : itemsSendableArray
         }
     })
 
@@ -230,4 +265,100 @@ exports.markingProductCODAsDone = async(req, res, next)=>{
     })
 }
 
+const combooffers = [
+    {
+        offer_number : 1,
+        items : [
+            {
+                name : 'allo',
+                units : ''
+            }
+            ,
+            {
+                name : 'tomato',
+                units : ''
+            }
+            ,
+            {
+                name : 'onion',
+                units : ''
+            }
+            ,
+            {
+                name : 'lasan',
+                units : '250gm'
+            }
+            ,
+            {
+                name : 'adrak',
+                units : '250gm'
+            }
+        ]
+    }
+    ,
+    {
+        offer_number : 1,
+        items : [
+            {
+                name : 'apple',
+                units : ''
+            }
+            ,
+            {
+                name : 'papita',
+                units : ''
+            }
+            ,
+            {
+                name : 'banana',
+                units : '6 piece'
+            }
+            
+        ]
+    }
+]
+
+
+
+
+exports.sendingStuffToHomePage = async(req, res, next)=>{
+    const products = await Product.find()
+
+    
+    const fruits = products.filter(el=>{
+        if(el.variety==='fruits'){
+            return el
+        }
+    })
+
+    const vegetables = products.filter(el=>{
+        if(el.variety==='vegetables'){
+            return el
+        }
+    })
+
+    const english = products.filter(el=>{
+        if(el.variety==='english'){
+            return el
+        }
+    })
+
+    const frozen = products.filter(el=>{
+        if(el.variety==='frozen'){
+            return el
+        }
+    })
+
+
+    res.status(200).json({ 
+        status : 'success',
+        data : {
+            fruits : fruits.slice(0, 5),
+            vegetables : vegetables.slice(0,5),
+            english : english.slice(0,5),
+            frozen : frozen.slice(0,5),
+            combo : combooffers
+        }
+    })
+}
 

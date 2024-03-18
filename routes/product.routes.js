@@ -5,6 +5,9 @@ const productController = require('./../controller/product.controller')
 
 router.route('/add-product').post(productController.addingProduct)
 router.route('/all-products').get(productController.sendingAllvariety)
+router.route('/home-stuff').get(productController.sendingStuffToHomePage)
+
+
 router.route('/update-products').post(productController.updatingProductPrice)
 router.route('/bulk-value').get(productController.makingBulkOrderValues)
 router.route('/all-placed-orders').get(productController.sendingAllPlacedOrders)

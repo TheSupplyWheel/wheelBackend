@@ -3,10 +3,17 @@ const router = express.Router()
 const auth = require('./../controller/auth.controller')
 
 router.route('/open-acc').post(auth.createAccount)
+router.route('/sending-user').get(auth.sendingUSerData)
+router.route('/change-address').post(auth.changeAddress)
+
 router.route('/logout').get(auth.LoggingOut)
 router.route('/login').post(auth.Login)
 router.route('/forgot').post(auth.forgotPassword)
 router.route('/add-to-cart').post(auth.cartPreperation)
+router.route('/combo-offer').post(auth.PuttingComboToCart)
+router.route('/delete-all-cart').get(auth.deleteCompleteCart)
+router.route('/list-of-elements-in-cart').get(auth.sendingCartItemsOnlyWithoutCalculations)
+
 router.route('/cart-items').get(auth.sendingAlreadyAddedCart)
 router.route('/cart-update').post(auth.updatingUnits)
 router.route('/online-payment').get(auth.onlinePayment)
@@ -16,7 +23,7 @@ router.route('/placed_orders').get(auth.sendingPlacedOrder)
 router.route('/feedback').post(auth.feedback)
 router.route('/delete').post(auth.deletingCartItem)
 router.route('/complain').post(auth.complain)
-
+router.route('/code').get(auth.code)
 
 
 module.exports = router

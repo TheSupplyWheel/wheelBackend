@@ -44,6 +44,17 @@ const signupSchema = new mongoose.Schema({
         }
     }]
     ,
+    combos : [{
+        list : {
+            type : Array
+        }
+        ,
+        date : {
+            type : String,
+            default : new Date().toLocaleDateString()
+        }
+    }]
+    ,
     placed_orders : [{
         item_list : {
             type : Array

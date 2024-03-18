@@ -11,14 +11,18 @@
   "license": "ISC",
   "dependencies": {
     "bcryptjs": "^2.4.3",
+    "connect-timeout": "^1.9.0",
     "cors": "^2.8.5",
+    "crypto": "^1.0.1",
     "dotenv": "^16.4.5",
     "express": "^4.18.3",
+    "follow-redirects": "^1.15.6",
     "html-pdf": "^3.0.1",
     "jsonwebtoken": "^9.0.2",
     "mongoose": "^8.2.1",
     "node-localstorage": "^3.0.5",
     "nodemon": "^3.1.0",
-    "razorpay": "^2.9.2"
+    "razorpay": "^2.9.2",
+    "twilio": "^5.0.1"
   }
 }
