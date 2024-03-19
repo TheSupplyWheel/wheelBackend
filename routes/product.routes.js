@@ -4,7 +4,7 @@ const router = express.Router()
 const productController = require('./../controller/product.controller')
 
 router.route('/add-product').post(productController.addingProduct)
-router.route('/all-products').get(productController.sendingAllvariety)
+router.route('/all-products').post(productController.sendingAllvariety)
 router.route('/home-stuff').get(productController.sendingStuffToHomePage)
 
 

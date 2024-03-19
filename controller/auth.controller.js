@@ -23,7 +23,7 @@ exports.createAccount = async(req, res, next)=>{
     const passwordCrypted = await bcrypt.hash(password, 12)
     const createAcc = await SignUp.create({username, email, password : passwordCrypted, address, phone, key})
     const token = await jwt.sign({id : createAcc._id},process.env.STRING)
-    localStorage.setItem('b2cToken', token)
+    // localStorage.setItem('b2cToken', token)
 
     res.status(200).json({
         status : 'success',
@@ -61,7 +61,7 @@ exports.Login = async(req, res, next)=>{
         return
     }
     const token = await jwt.sign({id : findingUser[0]._id},process.env.STRING)
-    localStorage.setItem('b2cToken', token)
+    // localStorage.setItem('b2cToken', token)
 
     res.status(200).json({
         status : 'success',
@@ -84,10 +84,11 @@ exports.forgotPassword = async(req, res, next)=>{
         })
         return;
     } 
+    let token = ''
     if(findingUser[0].key === key){
         findingUser[0].password = await bcrypt.hash(password, 12)
-        const token = await jwt.sign({id : findingUser[0]._id},process.env.STRING)
-        localStorage.setItem('b2cToken', token)
+        token = await jwt.sign({id : findingUser[0]._id},process.env.STRING)
+        // localStorage.setItem('b2cToken', token)
     }else{
         res.status(200).json({
             status : 'success',
@@ -101,6 +102,7 @@ exports.forgotPassword = async(req, res, next)=>{
     res.status(200).json({
         status : 'success',
         data : {
+            token,
             message : 'password changed you can login now'
         }
     })
@@ -117,19 +119,26 @@ exports.LoggingOut = async(req, res,next)=>{
 }
 
 exports.cartPreperation = async(req, res, next)=>{
-    const {itemName, units, price} = req.body;
-    const token =localStorage.getItem('b2cToken')
-    if(!token){
+    const {itemName, units, price,token} = req.body;
+    // const token =localStorage.getItem('b2cToken')
+    const items = await Product.find()
+
+    if(token==='logout'){
         res.status(200).json({
             status : 'success',
             data : {
+                items : items,
                 cart : [],
                 nameArr : [],
+                pricegross : 0,
                 message : 'please login or create your account first'
             }
         }) 
         return 
     }
+
+    console.log('sdssdx')
+
     const decode = await promisify(jwt.verify)(token, process.env.STRING)
     const findingUser = await SignUp.findById(decode.id)
     
@@ -140,13 +149,14 @@ exports.cartPreperation = async(req, res, next)=>{
     })
     findingUser.save() 
 
+    console.log(findingUser)
+
     const nameArr = []
     findingUser.cart.forEach(el=>{
         nameArr.push(el.itemName)
     })
 
     const itemsSendableArray = []
-    const items = await Product.find()
     items.forEach(el=>{
         const obj = {
             name : el.name,
@@ -181,8 +191,8 @@ exports.cartPreperation = async(req, res, next)=>{
 }
 
 exports.sendingAlreadyAddedCart = async(req, res, next)=>{
-    const token =localStorage.getItem('b2cToken')
-    if(!token){
+    const {token} = req.body
+    if(token==='logout'){
         res.status(200).json({
             status : 'success',
             data : {
@@ -231,8 +241,8 @@ exports.sendingAlreadyAddedCart = async(req, res, next)=>{
 exports.updatingUnits = async(req, res, next)=>{
     const {units, name} = req.body;
     console.log(units)
-    const token =localStorage.getItem('b2cToken')
-    if(!token){
+    const {token} = req.body
+    if(token==='logout'){
         res.status(200).json({
             status : 'success',
             data : {
@@ -285,8 +295,7 @@ exports.updatingUnits = async(req, res, next)=>{
 }
 
 exports.deletingCartItem = async(req, res, next)=>{
-    const {name} = req.body
-    const token =localStorage.getItem('b2cToken')
+    const {name, token} = req.body
     const decode = await promisify(jwt.verify)(token, process.env.STRING)
     const findingUser = await SignUp.findById(decode.id)
     const cart = findingUser.cart
@@ -322,20 +331,30 @@ exports.deleteCompleteCart = async(req, res, next)=>{
 }
 
 exports.sendingCartItemsOnlyWithoutCalculations = async(req, res, next)=>{
-    const token =localStorage.getItem('b2cToken')
+    const {token} =req.body
+    console.log(token)
+    if(token==='logout'){
+        res.status(200).json({
+            status : 'success',
+            data : {
+                cart : []
+            }
+        })
+        return
+    }
     const decode = await promisify(jwt.verify)(token, process.env.STRING)
     const findingUser = await SignUp.findById(decode.id)
     const cart = findingUser.cart
     res.status(200).json({
         status : 'success',
         data : {
-            cart
+            cart : cart ? cart : []
         }
     })
 }
 
 exports.onlinePayment = async(req, res, next)=>{
-    const token =localStorage.getItem('b2cToken')
+    const {token} = req.body
     const decode = await promisify(jwt.verify)(token, process.env.STRING)
     const findingUser = await SignUp.findById(decode.id)
     const cart = findingUser.cart
@@ -377,7 +396,7 @@ exports.validatingPays = async(req, res, next)=>{
     hmac.update(razorpay_order_id + "|" + razorpay_payment_id)
     const generated_signature = hmac.digest('hex')
     if(razorpay_signature===generated_signature){ 
-        const token =localStorage.getItem('b2cToken')
+        const {token} = req.body;
         const decode = await promisify(jwt.verify)(token, process.env.STRING)
         const findingUser = await SignUp.findById(decode.id)
         const cart = findingUser.cart
@@ -431,7 +450,7 @@ exports.validatingPays = async(req, res, next)=>{
 
 
 exports.codAndPlacingOrder = async(req, res, next)=>{
-    const token =localStorage.getItem('b2cToken')
+    const {token} = req.body
     const decode = await promisify(jwt.verify)(token, process.env.STRING)
     const findingUser = await SignUp.findById(decode.id)
     const cart = findingUser.cart
@@ -473,8 +492,8 @@ exports.codAndPlacingOrder = async(req, res, next)=>{
 }
 
 exports.sendingPlacedOrder = async(req, res, next)=>{
-    const token =localStorage.getItem('b2cToken')
-    if(!token){
+    const {token} =req.body
+    if(token==='logout'){
         res.status(200).json({
             status : 'success',
             data : {
@@ -500,9 +519,8 @@ exports.sendingPlacedOrder = async(req, res, next)=>{
 
 
 exports.feedback = async(req, res, next)=>{
-    const {feedbackMessage} = req.body;
-    const token =localStorage.getItem('b2cToken')
-    if(!token){
+    const {feedbackMessage, token} = req.body;
+    if(token==='logout'){
         res.status(200).json({
             status : 'success',
             data : {
@@ -530,9 +548,8 @@ exports.feedback = async(req, res, next)=>{
 
 
 exports.complain = async(req, res, next)=>{
-    const {subject, description} = req.body;
-    const token =localStorage.getItem('b2cToken')
-    if(!token){
+    const {subject, description, token} = req.body;
+    if(token==='logout'){
         res.status(200).json({
             status : 'success',
             data : {
@@ -557,7 +574,7 @@ exports.complain = async(req, res, next)=>{
 exports.PuttingComboToCart = async(req, res, next)=>{
     const {list} = req.body;
     const token =localStorage.getItem('b2cToken')
-    if(!token){
+    if(token==='logout'){
         res.status(200).json({
             status : 'success',
             data : {
@@ -581,8 +598,8 @@ exports.PuttingComboToCart = async(req, res, next)=>{
 }
 
 exports.sendingUSerData = async(req, res, next)=>{
-    const token =localStorage.getItem('b2cToken')
-    if(!token){
+    const {token} =req.body
+    if(token==='logout'){
         res.status(200).json({
             status : 'success',
             data : {
@@ -604,8 +621,16 @@ exports.sendingUSerData = async(req, res, next)=>{
 }
 
 exports.changeAddress = async(req, res, next)=>{
-    const {address} = req.body;
-    const token =localStorage.getItem('b2cToken')
+    const {address,token} = req.body;
+    if(token==='logout'){
+        res.status(200).json({
+            status : 'success',
+            data : {
+                message : 'Login or create your account'
+            }
+        })
+        return
+    }
     const decode = await promisify(jwt.verify)(token, process.env.STRING)
     const findingUser = await SignUp.findById(decode.id)
     findingUser.address = address
@@ -618,25 +643,22 @@ exports.changeAddress = async(req, res, next)=>{
 }
 
 var timeout = require('connect-timeout')
+const { Infobip, AuthType } =  require('@infobip-api/sdk');
+var https = require('follow-redirects').https;
+var fs = require('fs');
+const {PythonShell} = require('python-shell')
 
 exports.code = async(req, res, next)=>{
+    let options = {
+        scriptPath : __dirname,
+        args : ['john', 45]
+    }
 
-    const accountSid = 'AC7526bd4af40d83f63312572f54b61c58';
-const authToken = '92d3f8e4b66b1930d83cfe693824c573';
-const client = require('twilio')(accountSid, authToken);
-const otp = Math.trunc(Math.random()*778884)
-client.messages
-    .create({
-        body: `Welcome to your OTP is ${otp}`,
-        from: 'whatsapp:+14155238886',
-        to: 'whatsapp:+919914153088'
-    })
-    .then(message => console.log(message.sid))
-    
-    
-    
-    res.status(200).json({
-        status : 'success'
-    })
+    PythonShell.run('py.py', options).then(messages=>{
+        console.log('finished');
+            res.status(200).json({
+                status : 'success',
+            })
+    });
 
 }
