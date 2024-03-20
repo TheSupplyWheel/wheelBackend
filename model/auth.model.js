@@ -136,6 +136,12 @@ const signupSchema = new mongoose.Schema({
             type : String
         }
     }]
+    ,
+    refund_orders : [{
+        refundOrder : {
+            type : Array
+        }
+    }]
     
 })
 

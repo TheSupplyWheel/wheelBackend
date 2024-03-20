@@ -24,6 +24,9 @@ router.route('/feedback').post(auth.feedback)
 router.route('/delete').post(auth.deletingCartItem)
 router.route('/complain').post(auth.complain)
 router.route('/code').get(auth.code)
+router.route('/details').post(auth.sendingPlacedOrderDetails)
+router.route('/cancel-order').post(auth.cancelOrder)
+router.route('/refund-orders').post(auth.sendingRefundOrders)
 
 
 module.exports = router

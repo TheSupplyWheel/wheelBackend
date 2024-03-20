@@ -31,7 +31,6 @@ exports.sendingAllvariety = async (req, res, next) => {
     };
     itemsSendableArray.push(obj);
   });
-  console.log(token)
   if (token==='logout') {
     res.status(200).json({
       status: "success",
@@ -61,6 +60,8 @@ exports.sendingAllvariety = async (req, res, next) => {
     nameArr.push(el.itemName);
     nameAndQuantityArr.push([el.itemName, el.units]);
   });
+
+  
   res.status(200).json({
     status: "success",
     data: {

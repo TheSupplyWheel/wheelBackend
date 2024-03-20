@@ -10,7 +10,7 @@ const Complain = require('./../model/compain.model')
 
 exports.createAccount = async(req, res, next)=>{
     const {username, email, password, address, phone,key} = req.body;
-    const checkingAlreadyExist = await SignUp.find({email : email})
+    const checkingAlreadyExist = await SignUp.find({phone : phone})
     if(checkingAlreadyExist.length>0){
         res.status(200).json({
             status : 'error',
@@ -36,8 +36,8 @@ exports.createAccount = async(req, res, next)=>{
 }
 
 exports.Login = async(req, res, next)=>{
-    const {email, password} = req.body;
-    const findingUser = await SignUp.find({email : email})
+    const {phone, password} = req.body;
+    const findingUser = await SignUp.find({phone : phone})
     if(findingUser.length===0){
         res.status(200).json({
             status : 'error',
@@ -73,13 +73,13 @@ exports.Login = async(req, res, next)=>{
 }
 
 exports.forgotPassword = async(req, res, next)=>{
-    const {email,key,password} = req.body;
-    const findingUser = await SignUp.find({email : email})
+    const {phone,key,password} = req.body;
+    const findingUser = await SignUp.find({phone : phone})
     if(findingUser.length===0){
         res.status(200).json({
             status : 'error',
             data : {
-                message : 'invalid email'
+                message : 'invalid phone number'
             }
         })
         return;
@@ -137,7 +137,6 @@ exports.cartPreperation = async(req, res, next)=>{
         return 
     }
 
-    console.log('sdssdx')
 
     const decode = await promisify(jwt.verify)(token, process.env.STRING)
     const findingUser = await SignUp.findById(decode.id)
@@ -149,7 +148,6 @@ exports.cartPreperation = async(req, res, next)=>{
     })
     findingUser.save() 
 
-    console.log(findingUser)
 
     const nameArr = []
     findingUser.cart.forEach(el=>{
@@ -240,7 +238,6 @@ exports.sendingAlreadyAddedCart = async(req, res, next)=>{
 
 exports.updatingUnits = async(req, res, next)=>{
     const {units, name} = req.body;
-    console.log(units)
     const {token} = req.body
     if(token==='logout'){
         res.status(200).json({
@@ -282,7 +279,6 @@ exports.updatingUnits = async(req, res, next)=>{
         })
         price = Number(el.price.split('/-')[0]*el.units) + price
     })
-    console.log(price)
 
     res.status(200).json({
         status : 'success',
@@ -332,7 +328,6 @@ exports.deleteCompleteCart = async(req, res, next)=>{
 
 exports.sendingCartItemsOnlyWithoutCalculations = async(req, res, next)=>{
     const {token} =req.body
-    console.log(token)
     if(token==='logout'){
         res.status(200).json({
             status : 'success',
@@ -348,7 +343,7 @@ exports.sendingCartItemsOnlyWithoutCalculations = async(req, res, next)=>{
     res.status(200).json({
         status : 'success',
         data : {
-            cart : cart ? cart : []
+            cart : cart
         }
     })
 }
@@ -375,7 +370,6 @@ exports.onlinePayment = async(req, res, next)=>{
     };
 
     instance.orders.create(options, function(err, order) {
-        console.log(order);
         res.status(200).json({
             status : 'success',
             data : {
@@ -587,7 +581,6 @@ exports.PuttingComboToCart = async(req, res, next)=>{
     const decode = await promisify(jwt.verify)(token, process.env.STRING)
     const findingUser = await SignUp.findById(decode.id)
     findingUser.combos.push({list})
-    console.log(list)
     findingUser.save()
     res.status(200).json({
         status : 'success',
@@ -655,10 +648,81 @@ exports.code = async(req, res, next)=>{
     }
 
     PythonShell.run('py.py', options).then(messages=>{
-        console.log('finished');
             res.status(200).json({
                 status : 'success',
             })
     });
+
+}
+
+
+
+exports.sendingPlacedOrderDetails = async(req, res, next)=>{
+    const {token, order_id} = req.body;
+    const decode = await promisify(jwt.verify)(token, process.env.STRING)
+    const findingUser = await SignUp.findById(decode.id)
+    const placedOrders = findingUser.placed_orders
+    const productDetail = []
+    placedOrders.forEach(el=>{
+        if(String(el._id) === String(order_id)){
+            productDetail.push(el)
+        }
+    })
+
+    res.status(200).json({
+        status : 'success',
+        data : {
+            productDetail
+        }
+    })
+}
+
+exports.cancelOrder = async(req, res, next)=>{
+    const {token , order_id} = req.body
+    const decode = await promisify(jwt.verify)(token, process.env.STRING)
+    const findingUser = await SignUp.findById(decode.id)
+    let placed_orders = findingUser.placed_orders
+    let refundorder = []
+    placed_orders = placed_orders.filter(el=>{
+        if(String(el._id) !== String(order_id)){
+            return el
+        }else{
+            refundorder.push(el)
+        }
+    })
+
+    findingUser.placed_orders = placed_orders
+    
+    if(refundorder[0].payment_mode==='online'){
+        findingUser.refund_orders.push({
+            refundOrder : [...refundorder]
+        })
+    }
+    
+    findingUser.save()
+
+
+    res.status(200).json({
+        status : 'success',
+        data : {
+            message : 'Order cancelled sucessfully, you can get your refund in 3-5 working days if you already paid'
+        }
+    })
+}
+
+exports.sendingRefundOrders = async(req, res, next)=>{
+    const {token} = req.body;
+    const decode = await promisify(jwt.verify)(token, process.env.STRING)
+    const findingUser = await SignUp.findById(decode.id)
+    const refundOrders = findingUser.refund_orders
+
+    console.log(...refundOrders)
+
+    res.status(200).json({
+        status : 'success',
+        data : {
+            refundOrders
+        }
+    })
 
 }
