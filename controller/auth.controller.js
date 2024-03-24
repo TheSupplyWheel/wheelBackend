@@ -9,7 +9,7 @@ const bcrypt = require('bcryptjs')
 const Complain = require('./../model/compain.model')
 
 exports.createAccount = async(req, res, next)=>{
-    const {username, email, password, address, phone,key} = req.body;
+    const {phone, password} = req.body;
     const checkingAlreadyExist = await SignUp.find({phone : phone})
     if(checkingAlreadyExist.length>0){
         res.status(200).json({
@@ -21,7 +21,7 @@ exports.createAccount = async(req, res, next)=>{
         return 
     }
     const passwordCrypted = await bcrypt.hash(password, 12)
-    const createAcc = await SignUp.create({username, email, password : passwordCrypted, address, phone, key})
+    const createAcc = await SignUp.create({phone, password : passwordCrypted})
     const token = await jwt.sign({id : createAcc._id},process.env.STRING)
     // localStorage.setItem('b2cToken', token)
 
@@ -30,7 +30,18 @@ exports.createAccount = async(req, res, next)=>{
         data : {
             token : token,
             acc : createAcc,
-            message : `welcome remeber this secret key ${key} for future use`
+            message : `Welcome to orderfreshlife`
+        }
+    })
+}
+
+exports.checkingAlreadyExistingAccount = async(req, res, next)=>{
+    const {phone} = req.body;
+    const checkingAlreadyExist = await SignUp.find({phone : phone})
+    res.status(200).json({
+        status : 'success',
+        data : {
+            user : checkingAlreadyExist
         }
     })
 }
@@ -125,7 +136,7 @@ exports.cartPreperation = async(req, res, next)=>{
 
     if(token==='logout'){
         res.status(200).json({
-            status : 'success',
+            status : 'error',
             data : {
                 items : items,
                 cart : [],
@@ -279,13 +290,20 @@ exports.updatingUnits = async(req, res, next)=>{
         })
         price = Number(el.price.split('/-')[0]*el.units) + price
     })
+    const delivery = 20
+    const tax = 0
+    const platform = 2
+
+    let totalPrice = price + delivery + tax + platform
 
     res.status(200).json({
         status : 'success',
         data : {
             items : itemsSendableArray,
             message : 'updated',
-            price
+            price,
+            cart,
+            totalPrice
         }
     })
 }
@@ -415,6 +433,10 @@ exports.validatingPays = async(req, res, next)=>{
             razorpay_signature,
             payment_mode : 'online',
             payment_status : 'success',
+            packed : 'not packed',
+            delivered : 'not delivered',
+            outForDelivery : 'not out',
+            refund_status : 'no refund',
             creds : [findingUser.username, findingUser.address, findingUser.phone],
             client_id : findingUser._id
         })
@@ -469,6 +491,10 @@ exports.codAndPlacingOrder = async(req, res, next)=>{
         razorpay_signature : '',
         payment_mode : 'cod',
         payment_status : 'pending',
+        packed : 'not packed',
+        delivered : 'not delivered',
+        outForDelivery : 'not out',
+        refund_status : 'no refund',
         creds : [findingUser.username, findingUser.address, findingUser.phone],
         client_id : findingUser._id
     }) 
@@ -627,6 +653,7 @@ exports.changeAddress = async(req, res, next)=>{
     const decode = await promisify(jwt.verify)(token, process.env.STRING)
     const findingUser = await SignUp.findById(decode.id)
     findingUser.address = address
+    findingUser.save()
     res.status(200).json({
         status : 'success',
         data : {

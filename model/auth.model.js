@@ -129,6 +129,16 @@ const signupSchema = new mongoose.Schema({
             type : String,
             enum : ['not delivered', 'delivered']
         }
+        ,
+        outForDelivery : {
+            type : String,
+            enum : ['not out', 'out']
+        }
+        ,
+        refund_status : {
+            type : String,
+            enum : ['no refund', 'will refund', 'refunded']
+        }
     }]
     ,
     feedback : [{

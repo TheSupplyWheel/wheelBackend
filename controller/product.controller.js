@@ -344,6 +344,7 @@ exports.sendingStuffToHomePage = async (req, res, next) => {
       english: english.slice(0, 5),
       frozen: frozen.slice(0, 5),
       combo: combooffers,
+      allStuff : [...fruits, ...vegetables, ...english, ...frozen]
     },
   });
 };

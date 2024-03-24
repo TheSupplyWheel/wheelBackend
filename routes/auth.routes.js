@@ -8,6 +8,7 @@ router.route('/change-address').post(auth.changeAddress)
 
 router.route('/logout').get(auth.LoggingOut)
 router.route('/login').post(auth.Login)
+router.route('/exist').post(auth.checkingAlreadyExistingAccount)
 router.route('/forgot').post(auth.forgotPassword)
 router.route('/add-to-cart').post(auth.cartPreperation)
 router.route('/combo-offer').post(auth.PuttingComboToCart)
