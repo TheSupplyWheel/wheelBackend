@@ -349,3 +349,15 @@ exports.sendingStuffToHomePage = async (req, res, next) => {
     },
   });
 };
+
+
+
+exports.sendingAllProductsToAdmin = async(req, res, next)=>{
+  const items = await Product.find()
+  res.status(200).json({
+    status : 'success',
+    data : {
+      items
+    }
+  })
+}

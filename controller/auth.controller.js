@@ -307,7 +307,6 @@ exports.updatingUnits = async(req, res, next)=>{
         }
     })
 }
-
 exports.deletingCartItem = async(req, res, next)=>{
     const {updatedCart, token} = req.body
     const decode = await promisify(jwt.verify)(token, process.env.STRING)
