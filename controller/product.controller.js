@@ -79,10 +79,11 @@ exports.updatingProductPrice = async (req, res, next) => {
   const items = await Product.find({ name: name });
   items[0].price = price;
   items[0].save();
+  const allProducts = await Product.find()
   res.status(200).json({
     status: "success",
     data: {
-      items,
+      allProducts,
       message: "updated",
     },
   });
