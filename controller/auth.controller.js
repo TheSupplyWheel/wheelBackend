@@ -309,20 +309,20 @@ exports.updatingUnits = async(req, res, next)=>{
 }
 
 exports.deletingCartItem = async(req, res, next)=>{
-    const {name, token} = req.body
+    const {updatedCart, token} = req.body
     const decode = await promisify(jwt.verify)(token, process.env.STRING)
     const findingUser = await SignUp.findById(decode.id)
-    const cart = findingUser.cart
-    const updatedCart = cart.filter(el=>{
-        if(el.itemName!==name){
-            return el
-        }
-    })
     findingUser.cart = updatedCart
+    // const updatedCart = cart.filter(el=>{
+    //     if(el.itemName!==name){
+    //         return el
+    //     }
+    // })
+    // findingUser.cart = updatedCart
     findingUser.save()
 
     let price = 0
-    cart.forEach(el=>{
+    updatedCart.forEach(el=>{
         price = Number(el.price.split('/-')[0]*el.units) + price
     })
     const delivery = 20
@@ -331,15 +331,13 @@ exports.deletingCartItem = async(req, res, next)=>{
 
     let totalPrice = price + delivery + tax + platform
 
-    
-
     res.status(200).json({
         status : 'success',
         data : {
             cart : findingUser.cart,
             price,
             totalPrice,
-            message : `${name} deleted successfully`    
+            message : `deleted successfully`    
         }
     })
 }
