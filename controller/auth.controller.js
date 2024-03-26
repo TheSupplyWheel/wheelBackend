@@ -320,10 +320,30 @@ exports.deletingCartItem = async(req, res, next)=>{
     })
     findingUser.cart = updatedCart
     findingUser.save()
+
+    let price = 0
+    cart.forEach(el=>{
+        itemsSendableArray.forEach(item=>{
+            if(item.name===el.itemName){
+                item.quantity = el.units
+            }
+        })
+        price = Number(el.price.split('/-')[0]*el.units) + price
+    })
+    const delivery = 20
+    const tax = 0
+    const platform = 2
+
+    let totalPrice = price + delivery + tax + platform
+
+    
+
     res.status(200).json({
         status : 'success',
         data : {
             cart : findingUser.cart,
+            price,
+            totalPrice,
             message : `${name} deleted successfully`    
         }
     })

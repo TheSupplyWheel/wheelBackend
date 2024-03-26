@@ -43,6 +43,7 @@ exports.sendingAllvariety = async (req, res, next) => {
   }
   const decode = await promisify(jwt.verify)(token, process.env.STRING);
   const findingUser = await SignUp.findById(decode.id);
+  console.log(findingUser)
   const cart = findingUser.cart;
   let price = 0;
   cart.forEach((el) => {
