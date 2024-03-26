@@ -323,11 +323,6 @@ exports.deletingCartItem = async(req, res, next)=>{
 
     let price = 0
     cart.forEach(el=>{
-        itemsSendableArray.forEach(item=>{
-            if(item.name===el.itemName){
-                item.quantity = el.units
-            }
-        })
         price = Number(el.price.split('/-')[0]*el.units) + price
     })
     const delivery = 20
