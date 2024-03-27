@@ -375,11 +375,20 @@ exports.addingPurchasing = async(req, res, next)=>{
     }
     el.save()
   })
-  // items.save();
+ 
+  // sending purchsed array
+  let purchasedItems = []
+  items.forEach(el=>{
+    if(el.purchasingPrice[ElementInternals.purchasingPrice.length-1].date === new Date().toLocaleDateString()){
+      purchasedItems.push([el.name,el.purchasingPrice[ElementInternals.purchasingPrice.length-1].price])
+    }
+  })
+
   res.status(200).json({
     status : 'success',
     data : {
-      message : 'purchase added'
+      message : 'purchase added',
+      purchasedItems
     }
   })
 }
