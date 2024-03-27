@@ -373,8 +373,9 @@ exports.addingPurchasing = async(req, res, next)=>{
         price : price
       })
     }
+    el.save()
   })
-  items.save();
+  // items.save();
   res.status(200).json({
     status : 'success',
     data : {
