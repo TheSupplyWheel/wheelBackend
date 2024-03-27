@@ -16,7 +16,10 @@ const productSchema = new mongoose.Schema({
     selected : {
         type : Boolean
     }
-    
+    ,
+    image : {
+        type : String
+    }
 })
 
 const Product = mongoose.model('Product', productSchema)
