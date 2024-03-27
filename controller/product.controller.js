@@ -377,12 +377,12 @@ exports.addingPurchasing = async(req, res, next)=>{
   })
  
   // sending purchsed array
-  let purchasedItems = []
-  items.forEach(el=>{
-    if(el.purchasingPrice[el.purchasingPrice.length-1].date === new Date().toLocaleDateString()){
-      purchasedItems.push([el.name,el.purchasingPrice[el.purchasingPrice.length-1].price])
-    }
-  })
+  // let purchasedItems = []
+  // items.forEach(el=>{
+  //   if(el.purchasingPrice[el.purchasingPrice.length-1].date === new Date().toLocaleDateString()){
+  //     purchasedItems.push([el.name,el.purchasingPrice[el.purchasingPrice.length-1].price])
+  //   }
+  // })
 
   res.status(200).json({
     status : 'success',
