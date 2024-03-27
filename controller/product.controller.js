@@ -7,8 +7,8 @@ const jwt = require("jsonwebtoken");
 const { promisify } = require("util");
 
 exports.addingProduct = async (req, res, next) => {
-  const { name, price, variety } = req.body;
-  const addproduct = await Product.create({ name, price, variety });
+  const { name, price, variety,image } = req.body;
+  const addproduct = await Product.create({ name, price, variety,image });
   res.status(200).json({
     status: "success",
     data: {
