@@ -7,7 +7,7 @@ router.route('/add-product').post(productController.addingProduct)
 router.route('/all-products').post(productController.sendingAllvariety)
 router.route('/home-stuff').get(productController.sendingStuffToHomePage)
 router.route('/all-products-admin').get(productController.sendingAllProductsToAdmin)
-
+router.route('/add-purchase').post(productController.addingPurchasing)
 router.route('/update-products').post(productController.updatingProductPrice)
 router.route('/bulk-value').get(productController.makingBulkOrderValues)
 router.route('/all-placed-orders').get(productController.sendingAllPlacedOrders)

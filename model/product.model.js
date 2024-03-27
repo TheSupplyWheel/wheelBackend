@@ -20,6 +20,17 @@ const productSchema = new mongoose.Schema({
     image : {
         type : String
     }
+    ,
+    purchasingPrice : [{
+        date : {
+            type : String,
+            default : new Date().toLocaleDateString()
+        }
+        ,
+        price : {
+            type : String,
+        }
+    }]
 })
 
 const Product = mongoose.model('Product', productSchema)

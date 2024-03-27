@@ -12,7 +12,7 @@ exports.addingProduct = async (req, res, next) => {
   res.status(200).json({
     status: "success",
     data: {
-      message: "product added su",
+      message: "product added sucessfully",
     },
   });
 };
@@ -359,6 +359,26 @@ exports.sendingAllProductsToAdmin = async(req, res, next)=>{
     status : 'success',
     data : {
       items
+    }
+  })
+}
+
+
+exports.addingPurchasing = async(req, res, next)=>{
+  const {name,price} = req.body;
+  const items = await Product.find();
+  items.forEach(el=>{
+    if(el.name === name){
+      el.purchasingPrice.push({
+        price : price
+      })
+    }
+  })
+  items.save();
+  res.status(200).json({
+    status : 'success',
+    data : {
+      message : 'purchase added'
     }
   })
 }
