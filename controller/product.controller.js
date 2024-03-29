@@ -390,11 +390,13 @@ exports.addingPurchasing = async(req, res, next)=>{
 const combo = require('./../model/combo.model')
 
 exports.makeCombo = async(req, res, next)=>{
-  const {comboList} = req.body;
+  const {comboList,price} = req.body;
   const createCombo = await combo.create({})
   comboList.forEach(el=>{
     createCombo.comboProduct.push(el)
   })
+
+  createCombo.price = price
 
   createCombo.save()
   res.status(200).json({

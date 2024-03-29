@@ -6,6 +6,10 @@ const comboSchema = new mongoose.Schema({
         default : new Date().toLocaleDateString()
     }
     ,
+    price : {
+        type : String
+    }
+    ,
     comboProduct : [{
         name : {
             type : String
