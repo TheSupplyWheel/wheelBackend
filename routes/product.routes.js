@@ -14,5 +14,6 @@ router.route('/all-placed-orders').get(productController.sendingAllPlacedOrders)
 router.route('/mark-as-packed').post(productController.markingProductPackedAsDone)
 router.route('/mark-as-delivered').post(productController.markingProductDeliveredAsDone)
 router.route('/cod-collect').post(productController.markingProductCODAsDone)
+router.route('/add-combo').post(productController.makeCombo)
 
 module.exports = router 
