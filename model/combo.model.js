@@ -10,6 +10,11 @@ const comboSchema = new mongoose.Schema({
         type : String
     }
     ,
+    activate : {
+        type : Boolean,
+        default : true
+    }
+    ,
     comboProduct : [{
         name : {
             type : String
