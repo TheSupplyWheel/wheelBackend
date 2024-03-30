@@ -407,3 +407,14 @@ exports.makeCombo = async(req, res, next)=>{
   })
 
 }
+
+
+exports.sendingAllCombosToAdmin = async(req, res, next)=>{
+  const allCombos = await combo.find()
+  res.status(200).json({
+    status : 'success',
+    data : {
+      allCombos
+    }
+  })
+}
