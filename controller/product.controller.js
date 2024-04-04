@@ -105,7 +105,11 @@ exports.makingBulkOrderValues = async (req, res, next) => {
 
   const listItems = [];
   allOrderArr.forEach((el) => {
-    listItems.push(...el.item_list);
+    if(el.date === new Date().toLocaleDateString() && el.delivered!=='delivered'){
+      listItems.push(...el.item_list);
+    }else{
+      
+    }
   });
 
   let bulkunits = 0;
