@@ -387,7 +387,7 @@ exports.addingPurchasing = async(req, res, next)=>{
 }
 
 
-const combo = require('./../model/combo.model')
+const combo = require('./../model/combo.model');
 
 exports.makeCombo = async(req, res, next)=>{
   const {comboList,price} = req.body;
@@ -410,6 +410,42 @@ exports.makeCombo = async(req, res, next)=>{
 
 
 exports.sendingAllCombosToAdmin = async(req, res, next)=>{
+  const allCombos = await combo.find()
+  res.status(200).json({
+    status : 'success',
+    data : {
+      allCombos
+    }
+  })
+}
+
+
+exports.activationOfCombos = async(req, res, next)=>{
+  const {id,activation} = req.body;
+  const findingCombo = await combo.find({_id : id})
+  if(activation.toLowerCase()==='inactivate'){
+    findingCombo[0].activate = false
+  }
+  if(activation.toLowerCase()==='activate'){
+    findingCombo[0].activate = true
+  }
+
+  findingCombo[0].save()
+
+  const allCombos = await combo.find()
+  console.log(allCombos)
+
+  res.status(200).json({
+    status : 'success',
+    data : {
+      allCombos
+    }
+  })
+}
+
+exports.DeleteCombo = async(req, res, next)=>{
+  const {id} = req.body;
+  const comboDel = await combo.findByIdAndDelete(id);
   const allCombos = await combo.find()
   res.status(200).json({
     status : 'success',

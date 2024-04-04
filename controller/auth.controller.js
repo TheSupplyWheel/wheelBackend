@@ -492,6 +492,8 @@ exports.codAndPlacingOrder = async(req, res, next)=>{
     const total = grossprice + delivery + grossprice*(tax/100) + platform
     
     findingUser.placed_orders.push({
+        date : new Date().toLocaleDateString(),
+        time : new Date().toLocaleTimeString(),
         item_list : findingUser.cart,
         subtotal : grossprice,
         delivery : delivery,
