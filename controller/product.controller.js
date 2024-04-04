@@ -90,6 +90,8 @@ exports.updatingProductPrice = async (req, res, next) => {
 };
 
 exports.makingBulkOrderValues = async (req, res, next) => {
+  const {date} = req.body;
+  
   const allProdcuts = await Product.find();
   const nameOfProductsArr = [];
 
@@ -105,10 +107,10 @@ exports.makingBulkOrderValues = async (req, res, next) => {
 
   const listItems = [];
   allOrderArr.forEach((el) => {
-    if(el.date === new Date().toLocaleDateString() && el.delivered!=='delivered'){
+    if(el.date === date && el.delivered!=='delivered'){
       listItems.push(...el.item_list);
     }else{
-      
+
     }
   });
 
@@ -143,6 +145,7 @@ exports.makingBulkOrderValues = async (req, res, next) => {
     },
   });
 };
+
 
 exports.sendingAllPlacedOrders = async (req, res, next) => {
   const allOrders = await SignUp.find();
