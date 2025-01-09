@@ -19,19 +19,19 @@ exports.addingProduct = async (req, res, next) => {
 
 exports.sendingAllvariety = async (req, res, next) => {
   const items = await Product.find();
-  const { token } = req.body;
-
+  const token = req.body;
+  console.log(token)
   const itemsSendableArray = [];
   items.forEach((el) => {
     const obj = {
       name: el.name,
       price: el.price,
       quantity: 0,
-      variety: el.variety,
+      variety: el.variety,  
     };
     itemsSendableArray.push(obj);
   });
-  if (token==='logout') {
+  if (token.token==='logout') {
     res.status(200).json({
       status: "success",
       data: {

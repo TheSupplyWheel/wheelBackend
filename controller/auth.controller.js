@@ -9,8 +9,9 @@ const bcrypt = require('bcryptjs')
 const Complain = require('./../model/compain.model')
 
 exports.createAccount = async(req, res, next)=>{
-    const {phone, password} = req.body;
-    const checkingAlreadyExist = await SignUp.find({phone : phone})
+    const {user} = req.body;
+    console.log(user)
+    const checkingAlreadyExist = await SignUp.find({phone : user.phone})
     if(checkingAlreadyExist.length>0){
         res.status(200).json({
             status : 'error',
@@ -20,10 +21,9 @@ exports.createAccount = async(req, res, next)=>{
         }) 
         return 
     }
-    const passwordCrypted = await bcrypt.hash(password, 12)
-    const createAcc = await SignUp.create({phone, password : passwordCrypted})
+    const passwordCrypted = await bcrypt.hash(user.password, 12)
+    const createAcc = await SignUp.create({phone : user.phone, password : passwordCrypted, username : user.name, address : user.address})
     const token = await jwt.sign({id : createAcc._id},process.env.STRING)
-    // localStorage.setItem('b2cToken', token)
 
     res.status(200).json({
         status : 'success',
