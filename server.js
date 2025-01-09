@@ -8,7 +8,7 @@ const connection = mongoose.connect(process.env.CONNECTION).then(el=>{
     console.log('connection establish')
 })
 
-const port = process.env.PORT || 9999
+const port = 4000
 
 const server = app.listen(port, (req, res)=>{
     console.log(`The Backend is working at ${process.env.PORT}`)
