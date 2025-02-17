@@ -18,5 +18,10 @@ router.route('/add-combo').post(productController.makeCombo)
 router.route('/all-combos').get(productController.sendingAllCombosToAdmin)
 router.route('/activation-of-combos').post(productController.activationOfCombos)
 router.route('/delete-combo').post(productController.DeleteCombo)
+router.route('/admin-prods').get(productController.AllProductsToAdmin)
+
+router.route('/get-approve-orders').post(productController.sendingAllApproveOrdersToDeliveryApp)
+router.route('/accept-order-by-boy').post(productController.acceptingOrderByDeliveryBoy)
+router.route('/out-of-delivery').post(productController.MakingOrderOutOfDelivery)
 
 module.exports = router 

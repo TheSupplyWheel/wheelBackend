@@ -75,10 +75,17 @@ exports.sendingAllvariety = async (req, res, next) => {
 };
 
 exports.updatingProductPrice = async (req, res, next) => {
-  const { name, price } = req.body;
-  const items = await Product.find({ name: name });
-  items[0].price = price;
-  items[0].save();
+  const { list } = req.body;
+  list.forEach(async ItemFromFrontend=>{
+    const items = await Product.find();
+    items.forEach(itemFromDB=>{
+      if(ItemFromFrontend.name === itemFromDB.name){
+        itemFromDB.price = ItemFromFrontend.price
+      }
+      itemFromDB.save()
+    })
+  })
+  // items.save()
   const allProducts = await Product.find()
   res.status(200).json({
     status: "success",
@@ -458,6 +465,84 @@ exports.DeleteCombo = async(req, res, next)=>{
     status : 'success',
     data : {
       allCombos
+    }
+  })
+}
+
+
+exports.AllProductsToAdmin = async(req, res, next)=>{
+  const products = await Product.find()
+
+  res.status(200).json({
+    status : 'success',
+    products : products
+  })
+
+}
+
+
+exports.sendingAllApproveOrdersToDeliveryApp = async(req, res, next)=>{
+  const {date} = req.body;
+  const users = await SignUp.find()
+  const orders = []
+  users.forEach(el=>{
+    orders.push(...el.placed_orders)
+  })
+  const approveOrders = []
+  orders.forEach(el=>{
+    if(new Date().toLocaleDateString() === el.date && el.packed === 'packed' ){
+      approveOrders.push(el)
+    }
+  })
+
+  res.status(200).json({
+    status : 'success',
+    data : {
+      approves : approveOrders
+    }
+  })
+
+}
+
+
+
+exports.acceptingOrderByDeliveryBoy = async(req, res, next)=>{
+  const {client_id, order_id, deliveryBoyDetails} = req.body;
+  const findingUser = await SignUp.find({_id : client_id})
+  const acceptedOrder = []
+  findingUser[0].placed_orders.forEach(el=>{
+    if(String(el._id)===String(order_id)){
+      el.delivery_boy = deliveryBoyDetails.name,
+      el.delivery_boy_phone = deliveryBoyDetails.phone
+      acceptedOrder.push(el)
+    }
+  })
+
+  findingUser[0].save()
+
+  res.status(200).json({
+    status : 'success',
+    data : {
+      message : 'Order accepted successfully',
+      acceptedOrder
+    }
+  })
+}
+
+exports.MakingOrderOutOfDelivery = async(req, res, next)=>{
+  const {client_id, order_id} = req.body
+  const findingUser = await SignUp.find({_id : client_id})
+  findingUser[0].placed_orders.forEach(el=>{
+    if(String(el._id)===String(order_id)){
+      el.outForDelivery = 'out'
+    }
+  })
+
+  findingUser[0].save()
+  res.status(200).json({
+    status : 'success',
+    data : {
+      message : 'Order out of delivery',
     }
   })
 }

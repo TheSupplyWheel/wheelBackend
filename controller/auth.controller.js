@@ -477,29 +477,77 @@ exports.validatingPays = async(req, res, next)=>{
 }
 
 
+exports.codAndPlacingOrderSocket = async (el)=>{
+    const content = el.data
+    console.log(content)
+    const decode = await promisify(jwt.verify)(content.items.token, process.env.STRING)
+    const findingUser = await SignUp.findById(decode.id) 
+    // const cart = findingUser.cart
+    // let grossprice = 0
+    // cart.forEach(el=>{
+    //     grossprice = Number(grossprice) + Number(el.price.split('/-')[0]*el.units)
+    // })
+    // const delivery = 20;
+    // const tax = 0;
+    // const platform = 2;
+    // const total = grossprice + delivery + grossprice*(tax/100) + platform
+    const newOrder = {
+        date : new Date().toLocaleDateString(),
+        time : new Date().toLocaleTimeString(),
+        item_list : content.items.itemsList,
+        subtotal : content.items.grossBill,
+        delivery : content.items.delivery_charges,
+        tax : 0,
+        platform : 0,
+        total : content.items.totalBill,
+        razorpay_payment_id : '',
+        razorpay_order_id : '',
+        razorpay_signature : '',
+        payment_mode : 'cod',
+        payment_status : 'pending',
+        packed : 'not packed',
+        delivered : 'not delivered',
+        outForDelivery : 'not out',
+        refund_status : 'no refund',
+        creds : [findingUser.username, findingUser.address, findingUser.phone],
+        client_id : findingUser._id
+    }
+    findingUser.placed_orders.push(newOrder) 
+ 
+    
+    // findingUser.cart = []
+    const user = await SignUp.findById(decode.id)
+    const orderPlaced = user.placed_orders
+    
+    findingUser.save()
+
+    return newOrder;
+}
+
 exports.codAndPlacingOrder = async(req, res, next)=>{
-    const {token} = req.body
-    const decode = await promisify(jwt.verify)(token, process.env.STRING)
+    const content = req.body
+    console.log(content)
+    const decode = await promisify(jwt.verify)(content.items.token, process.env.STRING)
     const findingUser = await SignUp.findById(decode.id)
-    const cart = findingUser.cart
-    let grossprice = 0
-    cart.forEach(el=>{
-        grossprice = Number(grossprice) + Number(el.price.split('/-')[0]*el.units)
-    })
-    const delivery = 20;
-    const tax = 0;
-    const platform = 2;
-    const total = grossprice + delivery + grossprice*(tax/100) + platform
+    // const cart = findingUser.cart
+    // let grossprice = 0
+    // cart.forEach(el=>{
+    //     grossprice = Number(grossprice) + Number(el.price.split('/-')[0]*el.units)
+    // })
+    // const delivery = 20;
+    // const tax = 0;
+    // const platform = 2;
+    // const total = grossprice + delivery + grossprice*(tax/100) + platform
     
     findingUser.placed_orders.push({
         date : new Date().toLocaleDateString(),
         time : new Date().toLocaleTimeString(),
-        item_list : findingUser.cart,
-        subtotal : grossprice,
-        delivery : delivery,
-        tax : tax,
-        platform : platform,
-        total : total,
+        item_list : content.items.itemsList,
+        subtotal : content.items.grossBill,
+        delivery : content.items.delivery_charges,
+        tax : 0,
+        platform : 0,
+        total : content.items.totalBill,
         razorpay_payment_id : '',
         razorpay_order_id : '',
         razorpay_signature : '',
@@ -514,13 +562,32 @@ exports.codAndPlacingOrder = async(req, res, next)=>{
     }) 
  
     
-    findingUser.cart = []
+    // findingUser.cart = []
+    const user = await SignUp.findById(decode.id)
+    const orderPlaced = user.placed_orders
     
     findingUser.save()
     res.status(200).json({
         status : 'success',
         data : {
-            message : 'order placed sucessfully'
+            message : 'order placed sucessfully',
+            orders : orderPlaced
+        }
+    })
+
+
+}
+
+exports.sendingOrderBackToFrontend = async(req, res, next)=>{
+    const {token} = req.body
+    const decode = await promisify(jwt.verify)(token, process.env.STRING)
+    const user = await SignUp.findById(decode.id)
+    const orderPlaced = user.placed_orders
+    res.status(200).json({
+        status : 'success',
+        data : {
+            message : 'order placed sucessfully',
+            orderPlaced : orderPlaced
         }
     })
 }

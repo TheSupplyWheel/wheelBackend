@@ -139,6 +139,14 @@ const signupSchema = new mongoose.Schema({
             type : String,
             enum : ['no refund', 'will refund', 'refunded']
         }
+        ,
+        delivery_boy : {
+            type : String
+        }
+        ,
+        delivery_boy_phone : {
+            type : String
+        }
     }]
     ,
     feedback : [{
