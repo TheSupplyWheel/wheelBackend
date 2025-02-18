@@ -15,7 +15,7 @@ const port = 4000
 const server = http.createServer(app);
 const io = new Server(server, {
   cors: {
-    origin: ["https://oflcustomer.netlify.app/"], // React frontend ka URL
+    origin: ["https://oflcustomer.netlify.app/", "https://odfcusto.netlify.app/"], // React frontend ka URL
     methods: ["GET", "POST"]
   }
 });
